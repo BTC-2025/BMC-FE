@@ -1,0 +1,178 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Arial Rounded MT Bold", "Inter", system-ui, sans-serif;
+  --font-subheading: "Roboto", sans-serif;
+  --font-body: "Arial", sans-serif;
+
+  --color-primary: #195bac;
+  --color-primary-dark: #11407a;
+  --color-primary-light: #e9f4ff;
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+}
+
+@utility font-heading {
+  font-family: var(--font-heading);
+}
+
+@utility font-subheading {
+  font-family: var(--font-subheading);
+}
+
+@utility font-body {
+  font-family: var(--font-body);
+}
+
+:root {
+  --bg-app: #cfecf7;
+  --bg-surface: #ffffff;
+  --bg-element: #f8f9fc;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+}
+
+.dark {
+  --bg-app: #0f172a;
+  --bg-surface: #1e293b;
+  --bg-element: #334155;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #334155;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #f8f9fc; /* Soft gray/white background for the page */
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Global Scrollbar Removals - Hides visual scrollbars but maintains functionality */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.hero-gradient {
+  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  /* Or closer to the image: Soft violet/pink/blue mesh */
+  background: radial-gradient(
+    circle at 10% 20%,
+    rgb(239, 235, 255) 0%,
+    rgb(255, 240, 245) 40%,
+    rgb(230, 240, 255) 80%
+  );
+}
+
+.mesh-blob-1 {
+  background-color: #a78bfa;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+.mesh-blob-2 {
+  background-color: #38bdf8;
+  filter: blur(80px);
+  opacity: 0.4;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    overflow: visible !important;
+  }
+
+  /* Hide everything by default */
+  #root,
+  .no-print,
+  button,
+  .action-bar {
+    display: none !important;
+  }
+
+  /* Show only the printable content */
+  .printable-content {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    transform: none !important;
+  }
+
+  /* Specific rules for InvoiceTemplate portal */
+  .fixed.inset-0 {
+    position: static !important;
+    background: white !important;
+    backdrop-filter: none !important;
+  }
+
+  .bg-white.w-full.max-w-\[900px\] {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+
+  /* Ensure the sidebar colors print */
+  .bg-\[#e9f4ff\] {
+    background-color: #e9f4ff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .bg-\[#195bac\] {
+    background-color: #195bac !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .text-white {
+    color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

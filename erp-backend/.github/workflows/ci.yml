@@ -1,0 +1,30 @@
+name: ERP CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: erp
+          POSTGRES_USER: erp_user
+          POSTGRES_PASSWORD: erp_pass
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: |
+          export DATABASE_URL=postgresql://erp_user:erp_pass@localhost:5432/erp
+          python -c "from app.core.database import Base, engine; Base.metadata.create_all(bind=engine); print('DB Init Check OK')"

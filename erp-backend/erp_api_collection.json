@@ -1,0 +1,673 @@
+{
+	"info": {
+		"_postman_id": "erp-backend-v1",
+		"name": "Perfected ERP Backend - API v1",
+		"description": "Multi-tenant ERP Collection for testing all modules.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.access_token) {",
+									"    pm.environment.set(\"token\", jsonData.access_token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "admin",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "admin123",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Me",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Create Item",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Steel Pipe\",\n    \"sku\": \"ST-001\",\n    \"unit\": \"meter\",\n    \"reorder_level\": 10,\n    \"valuation_rate\": 500.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventory/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Items",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/inventory/items",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stock Adjust",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"item_id\": 1,\n    \"warehouse_id\": 1,\n    \"quantity\": 100,\n    \"reference\": \"Adjustment #1\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventory/adjust",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								"adjust"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Stock Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/inventory/stock-summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								"stock-summary"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Barcode",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/inventory/barcode/ST-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventory",
+								"barcode",
+								"ST-001"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Finance",
+			"item": [
+				{
+					"name": "Create Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"customer_name\": \"Global Industries\",\n    \"lines\": [\n        {\"description\": \"Consulting\", \"quantity\": 10, \"unit_price\": 100},\n        {\"description\": \"Deployment fee\", \"quantity\": 1, \"unit_price\": 500}\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/finance/invoices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"finance",
+								"invoices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Post Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/finance/invoices/1/post",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"finance",
+								"invoices",
+								"1",
+								"post"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Trial Balance",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/finance/trial-balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"finance",
+								"trial-balance"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Manufacturing (MFG)",
+			"item": [
+				{
+					"name": "Create BOM",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Standard Pipe Joint\",\n    \"finished_item_id\": 2,\n    \"items\": [\n        {\"raw_item_id\": 1, \"quantity_required\": 2.0}\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/mfg/boms",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"mfg",
+								"boms"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Work Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bom_id\": 1,\n    \"quantity_to_produce\": 10\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/mfg/work-orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"mfg",
+								"work-orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Produce (Execute)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/mfg/work-orders/1/produce?warehouse_id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"mfg",
+								"work-orders",
+								"1",
+								"produce"
+							],
+							"query": [
+								{
+									"key": "warehouse_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "CRM",
+			"item": [
+				{
+					"name": "Create Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Potential Enterprise\",\n    \"company\": \"Mega Corp\",\n    \"email\": \"lead@megacorp.com\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/crm/leads",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"crm",
+								"leads"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Deals",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/crm/deals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"crm",
+								"deals"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Notifications",
+			"item": [
+				{
+					"name": "List Templates",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/notifications/templates",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Manual Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"to\": \"test@example.com\",\n    \"template_name\": \"invoice_created\",\n    \"context\": {\n        \"invoice_id\": \"INV-999\",\n        \"customer_name\": \"Test Customer\",\n        \"total_amount\": 1500.0\n    }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/notifications/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"send"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Run Report (Finance Summary)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"filters\": {\"tenant_id\": 1}\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/reports/1/run",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"1",
+								"run"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Export PDF",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/reports/1/export/pdf",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"1",
+								"export",
+								"pdf"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BI Analytics",
+			"item": [
+				{
+					"name": "BI Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/bi/dashboard",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"bi",
+								"dashboard"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

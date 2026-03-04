@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+  db:
+      image: postgres:15
+      environment:
+          POSTGRES_DB: erp
+          POSTGRES_USER: erp_user
+          POSTGRES_PASSWORD: erp_pass
+      volumes:
+          - pgdata:/var/lib/postgresql/data
+      ports:
+          - "5434:5432"
+
+  backend:
+      build: ./erp-backend
+      env_file: ./erp-backend/.env
+      ports:
+          - "8000:8000"
+      depends_on:
+          - db
+          - redis
+      environment:
+          - DATABASE_URL=postgresql://erp_user:erp_pass@db:5432/erp
+          - REDIS_HOST=redis
+
+  redis:
+      image: redis:7-alpine
+      ports:
+          - "6379:6379"
+      restart: always
+
+  frontend:
+      build: 
+          context: .
+          dockerfile: Dockerfile
+          args:
+              - VITE_API_URL=http://localhost:8000
+      ports:
+          - "5173:80"
+      depends_on:
+          - backend
+
+volumes:
+  pgdata:
