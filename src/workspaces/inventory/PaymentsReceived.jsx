@@ -162,6 +162,15 @@ export default function PaymentsReceived() {
                     </option>
                   ))}
                 </select>
+                {unpaidInvoices.length === 0 && (
+                  <p className="text-[10px] font-bold text-amber-600 bg-amber-50 p-4 rounded-xl mt-2 border border-amber-100 flex items-start gap-2">
+                    <span className="text-sm leading-none">⚠️</span>
+                    <span>
+                      Invoices must be <b>"Posted"</b> to the General Ledger before they can be paid. 
+                      Go to <b>Finance to Invoices</b> to post your draft invoices.
+                    </span>
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-6">
@@ -217,7 +226,8 @@ export default function PaymentsReceived() {
               <div className="pt-6">
                 <button
                   type="submit"
-                  className="w-full bg-emerald-600 text-white py-6 rounded-[24px] text-[11px] font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 hover:bg-emerald-700 active:scale-95"
+                  className="w-full bg-emerald-600 text-white py-6 rounded-[24px] text-[11px] font-black uppercase tracking-[0.25em] shadow-2xl transition-all hover:-translate-y-1 hover:bg-emerald-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={unpaidInvoices.length === 0}
                 >
                   Confirm Transaction
                 </button>

@@ -104,6 +104,7 @@ class Shipment(Base):
     status = Column(String, default="PACKED")      # PACKED → IN_TRANSIT → SHIPPED → DELIVERED
     
     shipping_date = Column(DateTime, nullable=True)
+    estimated_arrival = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     initialized_by = Column(Integer, nullable=False)
 

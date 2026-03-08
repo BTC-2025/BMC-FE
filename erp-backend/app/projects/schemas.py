@@ -28,6 +28,12 @@ class MilestoneCreate(BaseModel):
     due_date: Optional[date] = None
 
 
+class MilestoneUpdate(BaseModel):
+    title: Optional[str] = None
+    due_date: Optional[date] = None
+    status: Optional[str] = None
+
+
 class ProjectMemberAdd(BaseModel):
     user_id: int
     role: str = "MEMBER"

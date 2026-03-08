@@ -28,7 +28,7 @@ def seed_everything():
     db = SessionLocal()
     
     # 0. Ensure tables exist (Reset for clean testing)
-    Base.metadata.drop_all(bind=engine)
+    # Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     
     # 1. Create Tenant

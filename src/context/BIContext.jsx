@@ -8,6 +8,8 @@ export const BIProvider = ({ children }) => {
   const [kpis, setKpis] = useState(null);
   const [revenue, setRevenue] = useState([]);
   const [operations, setOperations] = useState(null);
+  const [insights, setInsights] = useState([]);
+  const [topology, setTopology] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -19,14 +21,18 @@ export const BIProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const [k, r, o] = await Promise.all([
+      const [k, r, o, i, t] = await Promise.all([
         biApi.getDashboard(),
         biApi.getRevenue(),
         biApi.getOperations(),
+        biApi.getInsights(),
+        biApi.getTopology(),
       ]);
       setKpis(k.data || {});
       setRevenue(r.data || []);
       setOperations(o.data || {});
+      setInsights(i.data || []);
+      setTopology(t.data || {});
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to fetch BI data");
     } finally {
@@ -68,9 +74,14 @@ export const BIProvider = ({ children }) => {
     { id: 'ANA-003', type: 'Operational Efficiency', metric: '94.2%', change: '+2.1%', trend: 'up', period: 'This Month' },
   ];
 
-  const insights = [
-    { id: 'INS-001', title: 'Revenue Target', description: `Current revenue is $${formatNumber(kpiData?.total_revenue)}. Tracking well against goals.`, priority: 'High', category: 'Revenue', timestamp: 'Just now' },
-  ];
+  const bridgedInsights = insights.map((ins, idx) => ({
+    id: `INS-${idx}`,
+    title: ins.type === "POSITIVE" ? "Growth Insight" : ins.type === "WARNING" ? "Watch Area" : "Critical Item",
+    description: ins.text,
+    priority: ins.type === "CRITICAL" ? "High" : "Medium",
+    category: "System Analysis",
+    timestamp: "Just now"
+  }));
 
   const [forecasts] = useState([]);
   const [scenarios] = useState([]);
@@ -89,9 +100,10 @@ export const BIProvider = ({ children }) => {
         kpiData,
         trendData,
         stats,
+        topology,
         dashboards,
         analytics,
-        insights,
+        insights: bridgedInsights,
         forecasts,
         scenarios,
         error,

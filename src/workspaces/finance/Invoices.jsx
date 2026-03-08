@@ -74,39 +74,51 @@ export default function InvoicesView({ autoOpen }) {
     setFormData({ ...formData, lines: newLines });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    addInvoice({
-      ...formData,
-      target: formData.customer_name,
-      amount: totalAmount,
-    });
-    setShowModal(false);
-    setFormData({
-      customer_id: "",
-      customer_name: "",
-      reference: "",
-      lines: [{ description: "", quantity: 1, unit_price: 0, item_id: null }],
-      type: "Sales",
-    });
+    try {
+      await addInvoice({
+        ...formData,
+        target: formData.customer_name,
+        amount: totalAmount,
+      });
+      setShowModal(false);
+      setFormData({
+        customer_id: "",
+        customer_name: "",
+        reference: "",
+        lines: [{ description: "", quantity: 1, unit_price: 0, item_id: null }],
+        type: "Sales",
+      });
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
-  const handleSettle = (e) => {
+  const handleSettle = async (e) => {
     e.preventDefault();
-    recordPayment({
-      invoiceId: selectedInvoice.id,
-      amount: selectedInvoice.amount + (selectedInvoice.tax || 0),
-      type: selectedInvoice.type === "Sales" ? "Incoming" : "Outgoing",
-      method: paymentMethod,
-      target: selectedInvoice.target,
-      date: new Date().toISOString().split("T")[0],
-    });
-    setShowSettleModal(false);
+    try {
+      await recordPayment({
+        invoiceId: selectedInvoice.id,
+        amount: selectedInvoice.amount + (selectedInvoice.tax || 0),
+        type: selectedInvoice.type === "Sales" ? "Incoming" : "Outgoing",
+        method: paymentMethod,
+        target: selectedInvoice.target,
+        date: new Date().toISOString().split("T")[0],
+      });
+      setShowSettleModal(false);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handlePost = async (e, id) => {
     e.stopPropagation();
-    await postInvoice(id);
+    try {
+      await postInvoice(id);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (

@@ -117,8 +117,9 @@ export const FinanceProvider = ({ children }) => {
       setInvoices((prev) => [res.data, ...prev]);
       return res.data;
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to create invoice");
-      throw err;
+      const errorMsg = err.response?.data?.detail || "Failed to create invoice";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -131,7 +132,9 @@ export const FinanceProvider = ({ children }) => {
       await financeApi.postInvoice(id);
       await Promise.all([fetchInvoices(), fetchReports()]);
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to post invoice");
+      const errorMsg = err.response?.data?.detail || "Failed to post invoice";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -144,7 +147,9 @@ export const FinanceProvider = ({ children }) => {
       await financeApi.payInvoice(id, payment);
       await Promise.all([fetchInvoices(), fetchReports(), fetchPayments()]);
     } catch (err) {
-      setError(err.response?.data?.detail || "Payment failed");
+      const errorMsg = err.response?.data?.detail || "Payment failed";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -175,7 +180,9 @@ export const FinanceProvider = ({ children }) => {
       await fetchBills();
       showToast("Purchase Bill recorded", "success");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to create bill");
+      const errorMsg = err.response?.data?.detail || "Failed to create bill";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -196,7 +203,9 @@ export const FinanceProvider = ({ children }) => {
       await fetchBills();
       showToast("Purchase Bill updated", "success");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to update bill");
+      const errorMsg = err.response?.data?.detail || "Failed to update bill";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -209,7 +218,9 @@ export const FinanceProvider = ({ children }) => {
       await fetchBills();
       showToast("Purchase Bill deleted", "success");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to delete bill");
+      const errorMsg = err.response?.data?.detail || "Failed to delete bill";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -222,7 +233,9 @@ export const FinanceProvider = ({ children }) => {
       await fetchBills();
       showToast("Bill posted to General Ledger", "success");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to post bill");
+      const errorMsg = err.response?.data?.detail || "Failed to post bill";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -240,7 +253,9 @@ export const FinanceProvider = ({ children }) => {
       await fetchAccounts();
       showToast("New ledger account established", "success");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to create account");
+      const errorMsg = err.response?.data?.detail || "Failed to create account";
+      setError(errorMsg);
+      throw new Error(errorMsg);
     } finally {
       setLoading(false);
     }

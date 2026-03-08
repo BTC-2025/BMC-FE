@@ -56,6 +56,7 @@ class ShipmentCreate(BaseModel):
     origin_code: str
     carrier: str
     status: str | None = "PACKED"
+    estimated_arrival: object | None = None
 
 class ShipmentUpdate(BaseModel):
     origin_code: str | None = None
@@ -69,6 +70,7 @@ class ShipmentResponse(BaseModel):
     origin_code: str
     carrier: str
     status: str
+    estimated_arrival: object | None = None
     created_at: object
 
     class Config:

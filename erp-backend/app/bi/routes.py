@@ -62,6 +62,20 @@ def revenue_endpoint(
     return get_revenue_trend(db, tenant_id=tenant_id)
 
 @router.get(
+    "/insights",
+    dependencies=[
+        Depends(require_permission("bi.view_stats")),
+        Depends(require_bi_access)
+    ],
+)
+def insights_endpoint(
+    db: Session = Depends(get_db),
+    tenant_id: int = Depends(get_current_tenant_id)
+):
+    from app.bi.service import get_insights
+    return get_insights(db, tenant_id=tenant_id)
+
+@router.get(
     "/operations",
     dependencies=[
         Depends(require_permission("bi.view_stats")),
@@ -80,6 +94,20 @@ def operations_endpoint(
         "low_stock_items": full_kpis["low_stock_items"],
         "open_purchase_orders": full_kpis["open_purchase_orders"],
     }
+
+@router.get(
+    "/topology",
+    dependencies=[
+        Depends(require_permission("bi.view_stats")),
+        Depends(require_bi_access)
+    ],
+)
+def topology_endpoint(
+    db: Session = Depends(get_db),
+    tenant_id: int = Depends(get_current_tenant_id)
+):
+    from app.bi.service import get_topology_data
+    return get_topology_data(db, tenant_id=tenant_id)
 
 # 🟧 EXPORT (REAL CSV)
 @router.get(

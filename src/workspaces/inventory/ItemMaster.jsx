@@ -11,6 +11,8 @@ export default function ItemMaster() {
     removeProduct,
     categories,
     getBarcodeUrl,
+    error,
+    clearError,
   } = useInventory();
   const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -48,6 +50,7 @@ export default function ItemMaster() {
       status: "Active",
     });
     setShowModal(true);
+    clearError();
   };
 
   const openEdit = (p) => {
@@ -56,11 +59,16 @@ export default function ItemMaster() {
     setShowModal(true);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editMode) updateProduct(formData.sku, formData);
-    else addProduct(formData);
-    setShowModal(false);
+    try {
+      if (editMode) await updateProduct(formData.sku, formData);
+      else await addProduct(formData);
+      setShowModal(false);
+    } catch (err) {
+      console.error("Submission failed:", err);
+      // Modal stays open so user can see the error from context
+    }
   };
 
   const filteredProducts = products.filter(
@@ -286,6 +294,26 @@ export default function ItemMaster() {
           onSubmit={handleSubmit}
           className="p-10 grid grid-cols-2 gap-8 bg-white"
         >
+          {error && (
+            <div className="col-span-2 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 animate-in fade-in zoom-in duration-300">
+              <svg
+                className="w-5 h-5 text-rose-500 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                />
+              </svg>
+              <p className="text-[12px] font-bold text-rose-600 leading-tight">
+                {error}
+              </p>
+            </div>
+          )}
           <div className="space-y-2 col-span-2">
             <label className="text-[10px] font-black text-[#9CA3AF] uppercase tracking-widest pl-1">
               Global Product Identity
@@ -310,6 +338,7 @@ export default function ItemMaster() {
                 setFormData({ ...formData, sku: e.target.value })
               }
               disabled={editMode}
+              required
             />
           </div>
           <div className="space-y-2">

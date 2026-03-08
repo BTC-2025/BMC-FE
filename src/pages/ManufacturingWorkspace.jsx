@@ -44,9 +44,9 @@ function ManufacturingContent({ onBack, initialView }) {
     }
   }, [scaleMode, sidebarSections]);
 
-  const handleCreateOrder = () => {
-    // This will open a modal in a future step or just navigate to BOM to start
-    setActiveTab("BOM");
+  const handleCreateAction = () => {
+    // Dispatch a global event that individual components can listen to
+    window.dispatchEvent(new CustomEvent("open-create-modal", { detail: activeTab }));
   };
 
   const renderContent = () => {
@@ -105,12 +105,14 @@ function ManufacturingContent({ onBack, initialView }) {
             </div>
             
             <div className="flex items-center gap-4 shrink-0 px-2">
-               <button 
-                  onClick={handleCreateOrder}
-                  className="bg-[#111827] text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 transition-all whitespace-nowrap"
-               >
-                 + Create
-               </button>
+               {["BOM", "WorkOrders", "Orders"].includes(activeTab) && (
+                 <button 
+                    onClick={handleCreateAction}
+                    className="bg-[#111827] text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 transition-all whitespace-nowrap"
+                 >
+                   + Create
+                 </button>
+               )}
             </div>
           </div>
         )}

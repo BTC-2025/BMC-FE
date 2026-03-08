@@ -1,36 +1,21 @@
 import { useState } from "react";
+import { useBI } from "../../context/BIContext";
 
 export default function Analytics() {
-  const [metric, setMetric] = useState("Revenue");
-  const [groupBy, setGroupBy] = useState("Region");
+  const { topology, loading } = useBI();
+  const [metric, setMetric] = useState("CRM Pipeline");
   const [drillPath, setDrillPath] = useState([]); // Array of IDs for drill-down trail
-  const [analysisMode, setAnalysisMode] = useState("Composition"); // Composition vs Comparison
 
-  // Hierarchical Data for Drill-Down
-  const analyticalData = {
-    Region: [
-      { id: 'North', label: 'North', value: 12400000, target: 11000000, childrenType: 'Category' },
-      { id: 'South', label: 'South', value: 9800000, target: 10500000, childrenType: 'Category' },
-      { id: 'East', label: 'East', value: 6400000, target: 6000000, childrenType: 'Category' },
-      { id: 'West', label: 'West', value: 14200000, target: 13000000, childrenType: 'Category' },
-    ],
-    Category: {
-      North: [
-        { id: 'Electronics', label: 'Electronics', value: 6400000, target: 5800000 },
-        { id: 'Apparel', label: 'Apparel', value: 4200000, target: 4000000 },
-        { id: 'Grocery', label: 'Grocery', value: 1800000, target: 1200000 },
-      ],
-      South: [
-        { id: 'Electronics', label: 'Electronics', value: 3200000, target: 4500000 },
-        { id: 'Apparel', label: 'Apparel', value: 4800000, target: 4500000 },
-        { id: 'Grocery', label: 'Grocery', value: 1800000, target: 1500000 },
-      ]
-    }
+  // Use the new dynamic topology data from backend if available, fallback to empty
+  const analyticalData = topology && Object.keys(topology).length > 0 ? topology : {
+    "CRM Pipeline": [],
+    "Inventory Value": [],
+    "Project Budgets": []
   };
 
   const currentData = drillPath.length === 0 
-    ? analyticalData[groupBy] 
-    : analyticalData.Category[drillPath[0]] || [];
+    ? analyticalData[metric] || []
+    : []; // Drilldown logic can be expanded later if backend provides nested childrenType
 
   const formatCurrency = (val) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val);
 
@@ -39,6 +24,10 @@ export default function Analytics() {
       setDrillPath([...drillPath, item.id]);
     }
   };
+
+  if (loading) {
+    return <div className="p-12 text-center text-gray-500 font-bold uppercase tracking-widest animate-pulse">Synchronizing Topology...</div>;
+  }
 
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 text-left">
@@ -66,20 +55,11 @@ export default function Analytics() {
            <select 
              className="bg-gray-50 px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#195bac] outline-none border border-transparent hover:border-[#195bac]/20 cursor-pointer appearance-none min-w-[140px]"
              value={metric}
-             onChange={(e) => setMetric(e.target.value)}
+             onChange={(e) => {setMetric(e.target.value); setDrillPath([]);}}
            >
-              <option>Revenue Analysis</option>
-              <option>Volume Metrics</option>
-              <option>Marginality %</option>
-           </select>
-           <select 
-             className="bg-gray-100/50 px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-gray-500 outline-none border border-transparent hover:border-gray-200 cursor-pointer appearance-none min-w-[140px]"
-             value={groupBy}
-             onChange={(e) => {setGroupBy(e.target.value); setDrillPath([]);}}
-           >
-              <option>By Regional Hub</option>
-              <option>By Account Tier</option>
-              <option>By Logistics Center</option>
+              {Object.keys(analyticalData).map(key => (
+                 <option key={key} value={key}>{key}</option>
+              ))}
            </select>
         </div>
       </div>

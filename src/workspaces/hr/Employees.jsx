@@ -121,11 +121,11 @@ export default function EmployeesView() {
                   </p>
                 </td>
                 <td className="px-8 py-6 text-left font-black font-body text-[#1E293B] font-mono tracking-tighter">
-                  {emp.salary}
+                  ${Number(emp.basic_salary || 0).toLocaleString()}
                 </td>
                 <td className="px-8 py-6 text-left">
                   <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black font-subheading uppercase tracking-widest border border-emerald-100">
-                    {emp.status}
+                    Active
                   </span>
                 </td>
                 <td className="px-8 py-6">

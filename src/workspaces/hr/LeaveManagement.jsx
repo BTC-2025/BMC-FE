@@ -102,7 +102,10 @@ export default function LeaveManagementView() {
                         >
                           Approve
                         </button>
-                        <button className="px-5 py-2.5 rounded-xl bg-gray-50 text-[#111827] border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition-all">
+                        <button
+                          onClick={() => updateLeaveStatus(lv.id, "Rejected")}
+                          className="px-5 py-2.5 rounded-xl bg-gray-50 text-[#111827] border border-gray-100 text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 hover:text-rose-500 hover:border-rose-100 transition-all"
+                        >
                           Reject
                         </button>
                       </>

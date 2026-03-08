@@ -3,7 +3,10 @@ import api from "./api";
 export const hrmApi = {
   // Employees
   getEmployees: () => api.get("/hrm/employees"),
+  getEmployee: (id) => api.get(`/hrm/employees/${id}`),
   createEmployee: (data) => api.post("/hrm/employees", data),
+  updateEmployee: (id, data) => api.patch(`/hrm/employees/${id}`, data),
+  deleteEmployee: (id) => api.delete(`/hrm/employees/${id}`),
 
   // Attendance
   getAttendance: (employeeId = null) =>
@@ -14,6 +17,7 @@ export const hrmApi = {
   getLeaves: () => api.get("/hrm/leaves"),
   createLeave: (data) => api.post("/hrm/leaves", data),
   approveLeave: (id) => api.post(`/hrm/leaves/${id}/approve`),
+  rejectLeave: (id) => api.post(`/hrm/leaves/${id}/reject`),
 
   // Payroll
   getPayroll: () => api.get("/hrm/payroll"),
@@ -29,7 +33,12 @@ export const hrmApi = {
   // Recruitment
   getJobs: () => api.get("/hrm/recruitment/jobs"),
   createJob: (data) => api.post("/hrm/recruitment/jobs", data),
+  deleteJob: (jobId) => api.delete(`/hrm/recruitment/jobs/${jobId}`),
   applyJob: (data) => api.post("/hrm/recruitment/apply", data),
+  updateApplicationStatus: (applicationId, status) =>
+    api.patch(`/hrm/recruitment/applications/${applicationId}`, null, {
+      params: { status },
+    }),
   hireCandidate: (applicationId) =>
     api.post(`/hrm/recruitment/hire`, null, {
       params: { application_id: applicationId },

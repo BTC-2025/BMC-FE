@@ -137,6 +137,18 @@ export const HRProvider = ({ children }) => {
     }
   };
 
+  const rejectLeave = async (id) => {
+    setLoading(true);
+    try {
+      await hrmApi.rejectLeave(id);
+      await fetchLeaves();
+    } catch (err) {
+      setError(err.response?.data?.detail || "Leave rejection failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const processPayroll = async (employeeId, month) => {
     setLoading(true);
     try {
@@ -200,7 +212,7 @@ export const HRProvider = ({ children }) => {
           new Date().toISOString().split("T")[0],
     ).length,
     pendingLeaves: leaves.filter((l) => l.status === "PENDING").length,
-    activeJobs: 0,
+    activeJobs: recruitment.length,
     headcountGrowth: "0%",
     retentionRate: "100%",
   };
@@ -272,10 +284,41 @@ export const HRProvider = ({ children }) => {
         updateDepartment,
         removeDepartment,
         updateEmployee: async (id, data) => {
-          /* Optional: add updateEmployee API */
+          setLoading(true);
+          try {
+            const realId = id?.toString().includes("EMP-")
+              ? parseInt(id.split("-")[1])
+              : id;
+            const res = await hrmApi.updateEmployee(realId, {
+              ...data,
+              basic_salary: parseFloat(data.basic_salary) || 0,
+            });
+            setEmployees((prev) =>
+              prev.map((e) => (e.id === realId ? res.data : e))
+            );
+            await fetchEmployees();
+            return res.data;
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to update employee");
+            throw err;
+          } finally {
+            setLoading(false);
+          }
         },
         removeEmployee: async (id) => {
-          /* Optional: add deleteEmployee API */
+          setLoading(true);
+          try {
+            const realId = id?.toString().includes("EMP-")
+              ? parseInt(id.split("-")[1])
+              : id;
+            await hrmApi.deleteEmployee(realId);
+            setEmployees((prev) => prev.filter((e) => e.id !== realId));
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to delete employee");
+            throw err;
+          } finally {
+            setLoading(false);
+          }
         },
         logAttendance: async (data) => {
           const realId = data.employee_id?.toString().includes("EMP-")
@@ -291,8 +334,12 @@ export const HRProvider = ({ children }) => {
         },
         applyLeave,
         approveLeave,
-        updateLeaveStatus: (id, status) =>
-          status === "Approved" ? approveLeave(id) : null,
+        rejectLeave,
+        updateLeaveStatus: (id, status) => {
+          if (status === "Approved") return approveLeave(id);
+          if (status === "Rejected") return rejectLeave(id);
+          return null;
+        },
         processPayroll,
         completeReview: async (employeeId, score, feedback) => {
           setLoading(true);
@@ -365,6 +412,56 @@ export const HRProvider = ({ children }) => {
             await Promise.all([fetchEmployees(), fetchRecruitment()]);
           } catch (err) {
             setError(err.response?.data?.detail || "Hiring failed");
+          } finally {
+            setLoading(false);
+          }
+        },
+        createJob: async (data) => {
+          setLoading(true);
+          try {
+            const res = await hrmApi.createJob(data);
+            await fetchRecruitment();
+            return res.data;
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to create job");
+            throw err;
+          } finally {
+            setLoading(false);
+          }
+        },
+        deleteJob: async (jobId) => {
+          setLoading(true);
+          try {
+            await hrmApi.deleteJob(jobId);
+            await fetchRecruitment();
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to delete job");
+            throw err;
+          } finally {
+            setLoading(false);
+          }
+        },
+        updateApplicationStatus: async (applicationId, status) => {
+          setLoading(true);
+          try {
+            await hrmApi.updateApplicationStatus(applicationId, status);
+            await fetchRecruitment();
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to update status");
+            throw err;
+          } finally {
+            setLoading(false);
+          }
+        },
+        addApplication: async (data) => {
+          setLoading(true);
+          try {
+            const res = await hrmApi.applyJob(data);
+            await fetchRecruitment();
+            return res.data;
+          } catch (err) {
+            setError(err.response?.data?.detail || "Failed to add application");
+            throw err;
           } finally {
             setLoading(false);
           }

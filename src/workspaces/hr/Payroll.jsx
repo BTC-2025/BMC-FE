@@ -2,7 +2,7 @@ import { useHR } from "../../context/HRContext";
 import { formatNumber } from "../../utils/formatters";
 
 export default function PayrollView() {
-  const { payroll, employees, executePayroll, loading } = useHR();
+  const { payroll, employees, processPayroll, loading } = useHR();
 
   return (
     <div className="p-10 max-w-[1700px] mx-auto space-y-8 animate-in fade-in duration-500 text-left">
@@ -19,7 +19,7 @@ export default function PayrollView() {
         <button
           onClick={() => {
             const month = new Date().toISOString().slice(0, 7);
-            employees.forEach((emp) => executePayroll(emp.id, month));
+            employees.forEach((emp) => processPayroll(emp.realId || emp.id, month));
           }}
           className="bg-[#111827] text-white px-8 py-4 rounded-2xl text-[10px] font-black font-subheading uppercase tracking-[0.2em] shadow-xl hover:-translate-y-1 active:scale-95 transition-all"
         >

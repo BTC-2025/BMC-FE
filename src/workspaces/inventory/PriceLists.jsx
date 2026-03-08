@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { inventoryApi } from "../../services/inventoryApi";
+import { useInventory } from "../../context/InventoryContext";
 import BaseModal from "../../components/ui/BaseModal";
 
 export default function PriceLists() {
+  const { updatePriceList, deletePriceList } = useInventory();
   const [priceLists, setPriceLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [newPriceList, setNewPriceList] = useState({ name: "", type: "SALES", currency: "USD" });
+  const [editingList, setEditingList] = useState(null); // null = create, object = edit
+  const [formData, setFormData] = useState({ name: "", type: "SALES", currency: "USD" });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchPriceLists();
@@ -23,15 +28,48 @@ export default function PriceLists() {
     }
   };
 
-  const handleCreate = async (e) => {
+  const openCreate = () => {
+    setEditingList(null);
+    setFormData({ name: "", type: "SALES", currency: "USD" });
+    setError(null);
+    setShowModal(true);
+  };
+
+  const openEdit = (pl) => {
+    setEditingList(pl);
+    setFormData({ name: pl.name, type: pl.type, currency: pl.currency });
+    setError(null);
+    setShowModal(true);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSaving(true);
+    setError(null);
     try {
-      await inventoryApi.createPriceList(newPriceList);
-      setNewPriceList({ name: "", type: "SALES", currency: "USD" });
+      if (editingList) {
+        await updatePriceList(editingList.id, formData);
+        // Optimistically update local state to avoid refetch
+        setPriceLists((prev) => prev.map(p => p.id === editingList.id ? { ...p, ...formData } : p));
+      } else {
+        const res = await inventoryApi.createPriceList(formData);
+        setPriceLists((prev) => [...prev, res.data]);
+      }
       setShowModal(false);
-      fetchPriceLists();
     } catch (err) {
-      console.error("Failed to create price list:", err);
+      setError(err?.response?.data?.detail || err.message || "Operation failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (pl) => {
+    if (!window.confirm(`Delete price list "${pl.name}"? This cannot be undone.`)) return;
+    try {
+      await deletePriceList(pl.id);
+      setPriceLists((prev) => prev.filter(p => p.id !== pl.id));
+    } catch (err) {
+      alert(err?.response?.data?.detail || "Failed to delete price list");
     }
   };
 
@@ -54,7 +92,7 @@ export default function PriceLists() {
             </p>
         </div>
         <button 
-          onClick={() => setShowModal(true)}
+          onClick={openCreate}
           className="bg-[#111827] text-white px-10 py-5 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] shadow-2xl transition-all hover:-translate-y-1 hover:bg-black active:scale-95 flex items-center gap-4">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="4" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>
             Create Price List
@@ -105,8 +143,27 @@ export default function PriceLists() {
                                   </span>
                               </div>
                           </td>
-                          <td className="px-10 py-8 text-right">
-                               <button className="w-10 h-10 rounded-xl bg-gray-50 text-gray-400 flex items-center justify-center hover:bg-[#111827] hover:text-white transition-all shadow-sm">⚙️</button>
+                          <td className="px-10 py-8">
+                              <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
+                                  <button
+                                      onClick={() => openEdit(pl)}
+                                      className="w-10 h-10 rounded-xl bg-[#195bac]/10 text-[#195bac] flex items-center justify-center hover:bg-[#195bac] hover:text-white transition-all shadow-sm"
+                                      title="Edit Price List"
+                                  >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                          <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                      </svg>
+                                  </button>
+                                  <button
+                                      onClick={() => handleDelete(pl)}
+                                      className="w-10 h-10 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                                      title="Delete Price List"
+                                  >
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                      </svg>
+                                  </button>
+                              </div>
                           </td>
                       </tr>
                   ))}
@@ -119,19 +176,33 @@ export default function PriceLists() {
       <BaseModal isOpen={showModal} onClose={() => setShowModal(false)} className="max-w-xl">
           <div className="p-10 border-b border-gray-100 flex items-center justify-between text-left">
               <div>
-                <h2 className="text-3xl font-[1000] text-[#111827] tracking-tighter leading-none">Price List Archetype</h2>
-                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">Valuation Schema Configuration</p>
+                <h2 className="text-3xl font-[1000] text-[#111827] tracking-tighter leading-none">
+                  {editingList ? "Edit Price List" : "Price List Archetype"}
+                </h2>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-2">
+                  {editingList ? `Updating: ${editingList.name}` : "Valuation Schema Configuration"}
+                </p>
               </div>
-              <button onClick={() => setShowModal(false)} className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-xl hover:bg-rose-50 hover:text-rose-500 transition-all font-black">✕</button>
+              <button 
+                onClick={() => setShowModal(false)} 
+                className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-xl hover:bg-rose-50 hover:text-rose-500 transition-all font-black"
+              >
+                ✕
+              </button>
           </div>
-          <form onSubmit={handleCreate} className="p-12 space-y-8 text-left bg-white">
+          <form onSubmit={handleSubmit} className="p-12 space-y-8 text-left bg-white">
+            {error && (
+              <div className="p-4 bg-rose-50 border border-rose-100 rounded-2xl text-[12px] font-bold text-rose-600">
+                {error}
+              </div>
+            )}
             <div className="space-y-3">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">List Identity</label>
                 <input
                   type="text"
                   placeholder="e.g. Q1 Global Wholesale"
-                  value={newPriceList.name}
-                  onChange={(e) => setNewPriceList({ ...newPriceList, name: e.target.value })}
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-gray-50 border border-gray-100 rounded-[24px] px-8 py-5 text-base font-black text-[#1E293B] focus:ring-4 focus:ring-blue-50 outline-none transition-all placeholder:text-gray-300"
                   required
                 />
@@ -140,8 +211,8 @@ export default function PriceLists() {
                 <div className="space-y-3">
                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Channel Vector</label>
                     <select
-                      value={newPriceList.type}
-                      onChange={(e) => setNewPriceList({ ...newPriceList, type: e.target.value })}
+                      value={formData.type}
+                      onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                       className="w-full bg-gray-50 border border-gray-100 rounded-[24px] px-8 py-5 text-sm font-black text-[#1E293B] focus:ring-4 focus:ring-blue-50 outline-none"
                     >
                       <option value="SALES">Sales</option>
@@ -154,17 +225,22 @@ export default function PriceLists() {
                     <input
                       type="text"
                       placeholder="USD"
-                      value={newPriceList.currency}
-                      onChange={(e) => setNewPriceList({ ...newPriceList, currency: e.target.value.toUpperCase() })}
+                      value={formData.currency}
+                      onChange={(e) => setFormData({ ...formData, currency: e.target.value.toUpperCase() })}
                       className="w-full bg-gray-50 border border-gray-100 rounded-[24px] px-8 py-5 text-base font-black text-[#1E293B] focus:ring-4 focus:ring-blue-50 outline-none"
                       maxLength={3}
                     />
                 </div>
             </div>
-            <button type="submit" className="w-full bg-[#111827] text-white py-6 rounded-[28px] text-[11px] font-black uppercase tracking-[0.25em] shadow-2xl hover:bg-black transition-all active:scale-95">Deploy Pricing Schema</button>
+            <button 
+              type="submit" 
+              disabled={saving}
+              className="w-full bg-[#111827] text-white py-6 rounded-[28px] text-[11px] font-black uppercase tracking-[0.25em] shadow-2xl hover:bg-black transition-all active:scale-95 disabled:opacity-60"
+            >
+              {saving ? "Processing..." : editingList ? "Save Changes" : "Deploy Pricing Schema"}
+            </button>
           </form>
       </BaseModal>
     </div>
   );
 }
-

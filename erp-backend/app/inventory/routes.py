@@ -12,7 +12,7 @@ from app.inventory.models import Item, Warehouse, Category, ItemGroup, PriceList
 from app.auth.dependencies import get_current_user
 from app.inventory.schemas import (
     ItemCreate, ItemUpdate, StockAdjust, StockTransfer, StockAuditRow, 
-    WarehouseCreate, WarehouseResponse, CategoryCreate, CategoryResponse,
+    WarehouseCreate, WarehouseResponse, CategoryCreate, CategoryUpdate, CategoryResponse,
     ItemGroupCreate, ItemGroupResponse, PriceListCreate, PriceListResponse,
     PriceListItemCreate, PriceListItemResponse, AssemblyResponse
 )
@@ -307,6 +307,23 @@ def delete_category_endpoint(
         db.delete(cat)
         db.commit()
     return {"message": "Category deleted"}
+
+# 🟨 UPDATE CATEGORY
+@router.put("/categories/{cat_id}", response_model=CategoryResponse, dependencies=[Depends(require_permission("inventory.manage"))])
+def update_category_endpoint(
+    cat_id: int,
+    data: CategoryUpdate,
+    db: Session = Depends(get_db),
+    tenant_id: int = Depends(get_current_tenant_id)
+):
+    cat = db.query(Category).filter(Category.id == cat_id, Category.tenant_id == tenant_id).first()
+    if not cat:
+        raise HTTPException(status_code=404, detail="Category not found")
+    for key, value in data.dict(exclude_unset=True).items():
+        setattr(cat, key, value)
+    db.commit()
+    db.refresh(cat)
+    return cat
 
 # 🟨 ALIAS FOR ADJUST (As requested in STEP 3.2 naming convention)
 @router.post("/movements", dependencies=[Depends(require_permission("inventory.adjust"))])

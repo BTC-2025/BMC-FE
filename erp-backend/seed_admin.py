@@ -1,5 +1,6 @@
 from app.core.database import SessionLocal, engine, Base
 from app.auth import models
+from app.core.tenant import models as tenant_models
 from app.core.security import get_password_hash
 
 def init_db():

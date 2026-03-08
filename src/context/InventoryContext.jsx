@@ -145,6 +145,29 @@ export const InventoryProvider = ({ children }) => {
     }
   };
 
+  const updateItemGroup = async (id, data) => {
+    setError(null);
+    try {
+      const res = await inventoryApi.updateItemGroup(id, data);
+      setItemGroups((prev) => prev.map((g) => (g.id === id ? res.data : g)));
+      showToast("Item Group updated", "success");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to update item group");
+      throw err;
+    }
+  };
+
+  const deleteItemGroup = async (id) => {
+    setError(null);
+    try {
+      await inventoryApi.deleteItemGroup(id);
+      setItemGroups((prev) => prev.filter((g) => g.id !== id));
+      showToast("Item Group deleted", "success");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to delete item group");
+    }
+  };
+
   const fetchItemGroups = async () => {
     try {
       const res = await inventoryApi.getItemGroups();
@@ -159,7 +182,30 @@ export const InventoryProvider = ({ children }) => {
       const res = await inventoryApi.getPriceLists();
       setPriceLists(res.data);
     } catch (err) {
-      console.error("Failed to fetch price lists:", err);
+      console.error("Failed to fetch price lists", err);
+    }
+  };
+
+  const updatePriceList = async (id, data) => {
+    setError(null);
+    try {
+      const res = await inventoryApi.updatePriceList(id, data);
+      setPriceLists((prev) => prev.map((pl) => (pl.id === id ? res.data : pl)));
+      showToast("Price list updated", "success");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to update price list");
+      throw err;
+    }
+  };
+
+  const deletePriceList = async (id) => {
+    setError(null);
+    try {
+      await inventoryApi.deletePriceList(id);
+      setPriceLists((prev) => prev.filter((pl) => pl.id !== id));
+      showToast("Price list deleted", "success");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to delete price list");
     }
   };
 
@@ -545,8 +591,21 @@ export const InventoryProvider = ({ children }) => {
 
       await inventoryApi.deleteCategory(cat.id);
       setCategories((prev) => prev.filter((c) => c.id !== cat.id));
+      showToast("Category deleted", "success");
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to remove category");
+    }
+  };
+
+  const updateCategory = async (id, data) => {
+    setError(null);
+    try {
+      const res = await inventoryApi.updateCategory(id, data);
+      setCategories((prev) => prev.map((c) => (c.id === id ? res.data : c)));
+      showToast("Category updated", "success");
+    } catch (err) {
+      setError(err.response?.data?.detail || "Failed to update category");
+      throw err;
     }
   };
 
@@ -720,7 +779,13 @@ export const InventoryProvider = ({ children }) => {
         addSalesOrder,
         fulfillSalesOrder,
         updateSalesOrder,
+        updateCategory,
+        updateItemGroup,
+        deleteItemGroup,
+        updatePriceList,
+        deletePriceList,
       }}
+
     >
       {children}
     </InventoryContext.Provider>

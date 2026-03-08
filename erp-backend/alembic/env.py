@@ -11,11 +11,20 @@ from alembic import context
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from app.core.database import Base
-from app.auth.models import *  # Import all models to ensure they are registered
+from app.core.tenant.models import *
+from app.core.audit.models import *
+from app.auth.models import *
+from app.billing.models import *
 from app.crm.models import *
+from app.documents.models import *
+from app.finance.models import *
 from app.hrm.models import *
 from app.inventory.models import *
+from app.manufacturing.models import *
+from app.mfg.models import *
+from app.notifications.models import *
 from app.projects.models import *
+from app.reports.models import *
 from app.scm.models import *
 
 # this is the Alembic Config object, which provides

@@ -92,6 +92,7 @@ def initialize_shipment(
     carrier: str,
     status: str,
     performed_by: int,
+    estimated_arrival: datetime | None = None,
 ):
     try:
         tracking_number = generate_tracking_number()
@@ -103,7 +104,8 @@ def initialize_shipment(
             carrier=carrier,
             status=status,
             initialized_by=performed_by,
-            shipping_date=datetime.utcnow() if status == "SHIPPED" else None
+            shipping_date=datetime.utcnow() if status == "SHIPPED" else None,
+            estimated_arrival=estimated_arrival
         )
         
         db.add(shipment)

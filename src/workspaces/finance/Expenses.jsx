@@ -48,25 +48,33 @@ export default function ExpensesView() {
     setFormData({ ...formData, lines: newLines });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    recordExpense({
-      ...formData,
-      amount: totalAmount,
-      status: "Disbursed",
-    });
-    setShowModal(false);
-    setFormData({
-      supplier: "",
-      reference: "",
-      category: "Operational",
-      lines: [{ description: "", quantity: 1, unit_price: 0 }],
-    });
+    try {
+      await recordExpense({
+        ...formData,
+        amount: totalAmount,
+        status: "Disbursed",
+      });
+      setShowModal(false);
+      setFormData({
+        supplier: "",
+        reference: "",
+        category: "Operational",
+        lines: [{ description: "", quantity: 1, unit_price: 0 }],
+      });
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   const handlePost = async (e, id) => {
     e.stopPropagation();
-    await postBill(id);
+    try {
+      await postBill(id);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (

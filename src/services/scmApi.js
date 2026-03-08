@@ -1,6 +1,8 @@
 import api from "./api";
 
 export const scmApi = {
+  getFleet: () => api.get("/scm/fleet"),
+
   // Suppliers
   getSuppliers: () => api.get("/scm/suppliers"),
   createSupplier: (data) => api.post("/scm/suppliers", data),

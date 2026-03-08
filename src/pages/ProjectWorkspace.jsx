@@ -15,7 +15,7 @@ import ProjectBOM from "../workspaces/projects/ProjectBOM";
 
 function ProjectContent({ onBack, initialView }) {
   const { scaleMode } = useScaleMode();
-  const { projects, createProject, updateTask, addTask, loading, error } = useProjects();
+  const { projects, allTasks, allMilestones, createProject, updateTask, addTask, removeTask, addMilestone, updateMilestone, removeMilestone, loading, error } = useProjects();
   
   const [activeTab, setActiveTab] = useState(
     initialView === "overview" ? "Overview" : 
@@ -25,26 +25,13 @@ function ProjectContent({ onBack, initialView }) {
   const [isCreatingProject, setIsCreatingProject] = useState(initialView === "new");
   const [creationStep, setCreationStep] = useState(1);
   
-  // These still use mock for now as they are secondary to the goal
-  const [milestones, setMilestones] = useState([
-    { id: "MLS-001", title: "Alpha V1 Launch", date: "Jan 15", status: "Completed", description: "Initial system stability check." },
-    { id: "MLS-002", title: "Internal Refactor", date: "Feb 10", status: "In Progress", description: "Optimize core database calls." },
-  ]);
+  // These still use mock for now as they are secondary to the goal (team, issues)
   const [team, setTeam] = useState([
     { id: "MEM-001", name: "Gautam Karthik", role: "Project Manager", status: "Active", availability: "High", email: "gautam@btc.com", department: "Operations" },
   ]);
   const [issues, setIssues] = useState([
     { id: "ISS-001", title: "API Endpoint Latency", project: "General", priority: "Critical", status: "Open", date: "Jan 12", description: "Production endpoint responding with 5s delay." },
   ]);
-
-  // Flatten tasks from projects for the global task view
-  const allTasks = projects.flatMap(p => (p.tasks || []).map(t => ({
-    ...t,
-    id: `TSK-${t.id}`,
-    realId: t.id,
-    project: p.name,
-    projectId: p.realId
-  })));
 
   const enterpriseSections = [
     { title: "Core", items: [{ id: "Overview", label: "Overview", icon: "📊" }, { id: "Projects", label: "Projects", icon: "📁" }, { id: "Tasks", label: "Tasks", icon: "📋" }] },
@@ -89,10 +76,10 @@ function ProjectContent({ onBack, initialView }) {
     
     const props = { onSelectView: setActiveTab };
     switch (activeTab) {
-      case "Overview": return <ProjectOverview {...props} />;
-      case "Projects": return <ProjectList projects={projects} updateProject={() => {}} removeProject={() => {}} />;
-      case "Tasks": return <ProjectTasks tasks={allTasks} updateTask={updateTask} removeTask={() => {}} addTask={addTask} />;
-      case "Milestones": return <ProjectMilestones milestones={milestones} updateMilestone={() => {}} removeMilestone={() => {}} addMilestone={() => {}} />;
+      case "Overview": return <ProjectOverview {...props} projects={projects} milestones={allMilestones} tasks={allTasks} />;
+      case "Projects": return <ProjectList projects={projects} updateProject={updateProject} removeProject={removeProject} />;
+      case "Tasks": return <ProjectTasks tasks={allTasks} updateTask={updateTask} removeTask={removeTask} addTask={addTask} />;
+      case "Milestones": return <ProjectMilestones milestones={allMilestones} updateMilestone={updateMilestone} removeMilestone={removeMilestone} addMilestone={addMilestone} />;
       case "Team": return <ProjectTeam team={team} updateMember={() => {}} removeMember={() => {}} addMember={() => {}} />;
       case "Time": return <ProjectTime />;
       case "Issues": return <ProjectIssues issues={issues} updateIssue={() => {}} removeIssue={() => {}} addIssue={() => {}} />;

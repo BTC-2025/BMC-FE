@@ -43,16 +43,7 @@ export default function Warehousing({ items, onAdd, onUpdate, onDelete, fleet, o
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-       {/* 3D Warehouse Map Placeholder */}
-       <div className="bg-gray-900 rounded-3xl p-8 min-h-[400px] flex flex-col items-center justify-center text-center relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-cyan-500 via-transparent to-transparent"></div>
-          <span className="text-6xl mb-6">🏗️</span>
-          <h3 className="text-2xl font-black text-white mb-2">Facility Digital Twin</h3>
-          <p className="text-sm text-gray-400 max-w-xs mx-auto mb-8">Visualization of rack occupancy and forklift telemetry required.</p>
-          <button className="px-6 py-3 border border-white/20 rounded-xl text-white text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all">Launch Viewer</button>
-       </div>
-
+    <div className="max-w-4xl mx-auto space-y-8">
        <div className="space-y-6">
           <div className="bg-white p-6 rounded-2xl border border-gray-100">
              <div className="flex justify-between items-center mb-6">
@@ -64,23 +55,23 @@ export default function Warehousing({ items, onAdd, onUpdate, onDelete, fleet, o
                     + Add Zone
                  </button>
              </div>
-             <div className="space-y-4">
-                {displayItems.map((z, i) => (
-                   <div key={i} className="group">
-                      <div className="flex justify-between mb-2">
-                         <span className="text-xs font-bold text-gray-700">{z.location || z.zone}</span>
-                         <span className="text-xs font-black text-gray-900">{parseFloat(z.capacity) || z.use}%</span>
-                      </div>
-                      <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mt-1">
-                         <div className={`h-full bg-cyan-500`} style={{ width: `${parseFloat(z.capacity) || z.use}%` }}></div>
-                      </div>
-                      <div className="flex gap-2 justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleEdit(z)} className="text-[10px] font-black text-cyan-600 uppercase tracking-widest hover:underline">Edit</button>
-                            {onDelete && <button onClick={() => onDelete(z.id)} className="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600">Delete</button>}
-                      </div>
-                   </div>
-                ))}
-             </div>
+              <div className="space-y-4">
+                 {displayItems.filter(z => z.name || z.location || z.zone).map((z, i) => (
+                    <div key={i} className="group">
+                       <div className="flex justify-between mb-2">
+                          <span className="text-xs font-bold text-gray-700">{z.name || z.location || z.zone || `Zone ${i+1}`}</span>
+                          <span className="text-xs font-black text-gray-900">{parseFloat(z.capacity || z.use || 0).toFixed(0)}%</span>
+                       </div>
+                       <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden mt-1">
+                          <div className={`h-full bg-cyan-500`} style={{ width: `${parseFloat(z.capacity || z.use || 0)}%` }}></div>
+                       </div>
+                       <div className="flex gap-2 justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button onClick={() => handleEdit(z)} className="text-[10px] font-black text-cyan-600 uppercase tracking-widest hover:underline">Edit</button>
+                             {onDelete && <button onClick={() => onDelete(z.id)} className="text-[10px] font-black text-red-400 uppercase tracking-widest hover:text-red-600">Delete</button>}
+                       </div>
+                    </div>
+                 ))}
+              </div>
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-gray-100 flex items-center justify-between">

@@ -273,6 +273,34 @@ def delete_shipment(
     return {"message": "Shipment deleted"}
 
 
+# 🚚 FLEET APIs
+@router.get(
+    "/fleet",
+    dependencies=[Depends(require_permission("scm.view"))],
+)
+def get_fleet(
+    db: Session = Depends(get_db),
+    tenant_id: int = Depends(get_current_tenant_id)
+):
+    # Dynamic simulation based on the number of shipments
+    base_forklifts = 4
+    base_pallet_jacks = 12
+    
+    active_shipments = db.query(Shipment).filter(
+        Shipment.status.in_(["PACKED", "IN_TRANSIT"]), 
+        Shipment.tenant_id == tenant_id
+    ).count()
+    
+    # Simple dynamic logic: more active shipments might mean fewer available jacks
+    available_jacks = max(2, base_pallet_jacks - (active_shipments // 2))
+    available_forklifts = max(1, base_forklifts - (active_shipments // 4))
+
+    return {
+        "forklifts": available_forklifts,
+        "palletJacks": available_jacks,
+        "total_active_shipments": active_shipments
+    }
+
 # -----------------------------
 # SALES ORDERS (STEP 6.1)
 # -----------------------------

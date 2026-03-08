@@ -17,16 +17,20 @@ export default function PayablesView() {
     setShowModal(true);
   };
 
-  const handleSettle = (e) => {
+  const handleSettle = async (e) => {
     e.preventDefault();
-    recordPayment({
-      invoiceId: selectedBill.id,
-      amount: selectedBill.total_amount,
-      type: "Outgoing",
-      method: paymentMethod,
-      target: selectedBill.vendor_name,
-    });
-    setShowModal(false);
+    try {
+      await recordPayment({
+        invoiceId: selectedBill.id,
+        amount: selectedBill.total_amount,
+        type: "Outgoing",
+        method: paymentMethod,
+        target: selectedBill.vendor_name,
+      });
+      setShowModal(false);
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -45,10 +49,13 @@ export default function PayablesView() {
 
       <div className="bg-white rounded-[40px] border border-gray-100 shadow-sm overflow-hidden text-left">
         {apBills.length === 0 ? (
-          <div className="p-20 text-center text-gray-400 font-bold bg-gray-50/30">
-            <div className="text-4xl mb-4">✨</div>
-            <p className="text-sm font-black font-subheading uppercase tracking-widest text-gray-300">
+          <div className="p-20 text-center bg-gray-50/30 space-y-4">
+            <div className="text-4xl">✨</div>
+            <p className="text-sm font-black font-subheading uppercase tracking-widest text-[#111827]">
               All Obligations Settled
+            </p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest max-w-xs mx-auto leading-loose">
+              If you have draft bills, ensure they are "Posted" from the Operational Costs view to appear here.
             </p>
           </div>
         ) : (

@@ -23,6 +23,7 @@ export const inventoryApi = {
   // Categories
   getCategories: () => api.get("/inventory/categories"),
   createCategory: (data) => api.post("/inventory/categories", data),
+  updateCategory: (id, data) => api.put(`/inventory/categories/${id}`, data),
   deleteCategory: (id) => api.delete(`/inventory/categories/${id}`),
 
   // Item Groups

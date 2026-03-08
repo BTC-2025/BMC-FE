@@ -16,14 +16,17 @@ export default function SalesOrders() {
   });
   const [editData, setEditData] = useState({ customer_name: "", status: "" });
   const [fulfillWarehouseId, setFulfillWarehouseId] = useState(warehouses[0]?.id || 1);
+  const [localError, setLocalError] = useState(null);
 
   const openAdd = () => {
     setFormData({ customer: customers[0]?.name || "", product: products[0]?.name || "", qty: 0, amount: 0 });
+    setLocalError(null);
     setShowModal(true);
   };
 
   const handleFulfillOpen = (so) => {
     setSelectedSO(so);
+    setLocalError(null);
     setShowFulfillModal(true);
   };
 
@@ -34,20 +37,24 @@ export default function SalesOrders() {
   };
 
   const executeUpdate = async () => {
+    setLocalError(null);
     try {
         await updateSalesOrder(selectedSO.id, editData);
         setShowEditModal(false);
     } catch (e) {
         console.error(e);
+        setLocalError(e.response?.data?.detail || e.message || "Failed to update Sales Order");
     }
   };
 
   const executeFulfill = async () => {
+    setLocalError(null);
     try {
         await fulfillSalesOrder(selectedSO.id, fulfillWarehouseId);
         setShowFulfillModal(false);
     } catch (e) {
         console.error(e);
+        setLocalError(e.response?.data?.detail || e.message || "Failed to fulfill Sales Order");
     }
   };
 
@@ -201,6 +208,11 @@ export default function SalesOrders() {
           <div className="fixed inset-0 bg-[#0F172A]/80 backdrop-blur-xl z-[9999] flex items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
                <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden border border-white p-12 text-left">
                   <h2 className="text-2xl font-black text-[#111827] tracking-tighter mb-8 text-left uppercase">Fulfill Order SO-{selectedSO?.id}</h2>
+                  {localError && (
+                      <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-[12px] font-bold text-rose-600">
+                          {localError}
+                      </div>
+                  )}
                   <div className="space-y-6 text-left">
                       <div className="space-y-2 text-left">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1 text-left">Source Warehouse</label>
@@ -224,6 +236,11 @@ export default function SalesOrders() {
           <div className="fixed inset-0 bg-[#0F172A]/80 backdrop-blur-xl z-[9999] flex items-center justify-center p-6 animate-in fade-in zoom-in duration-300">
                <div className="bg-white rounded-[40px] shadow-2xl w-full max-w-md overflow-hidden border border-white p-12 text-left">
                   <h2 className="text-2xl font-black text-[#111827] tracking-tighter mb-8 text-left uppercase">Edit SO-{selectedSO?.id}</h2>
+                  {localError && (
+                      <div className="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-[12px] font-bold text-rose-600">
+                          {localError}
+                      </div>
+                  )}
                   <div className="space-y-6 text-left">
                       <div className="space-y-2 text-left">
                           <label className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] pl-1 text-left">Customer Name</label>

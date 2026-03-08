@@ -15,7 +15,7 @@ export const INVENTORY_CONFIG = {
             { id: "products", label: "Items", icon: "📦" },
             { id: "item_groups", label: "Item Groups", icon: "🗂️" },
             { id: "price_lists", label: "Price List", icon: "🏷️" },
-            { id: "categories", label: "Asset Categories", icon: "📂" },
+            { id: "asset_categories", label: "Asset Categories", icon: "📂" },
           ],
         },
         {

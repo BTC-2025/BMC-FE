@@ -3,6 +3,7 @@ import InventorySidebar from "../workspaces/inventory/InventorySidebar";
 import InventoryOverview from "../workspaces/inventory/InventoryOverview";
 import ItemMaster from "../workspaces/inventory/ItemMaster";
 import Categories from "../workspaces/inventory/Categories";
+import AssetCategories from "../workspaces/inventory/AssetCategories";
 import Suppliers from "../workspaces/inventory/Suppliers";
 import Customers from "../workspaces/inventory/Customers";
 import Transactions from "../workspaces/inventory/Transactions";
@@ -73,6 +74,8 @@ export default function InventoryWorkspace({ onBack, initialView }) {
           return <ItemMaster />;
         case "categories":
           return <Categories />;
+        case "asset_categories":
+          return <AssetCategories />;
         case "suppliers":
           return <Suppliers />;
         case "customers":

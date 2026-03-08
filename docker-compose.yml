@@ -23,6 +23,8 @@ services:
       environment:
           - DATABASE_URL=postgresql://erp_user:erp_pass@db:5432/erp
           - REDIS_HOST=redis
+      volumes:
+          - ./erp-backend:/app
 
   redis:
       image: redis:7-alpine

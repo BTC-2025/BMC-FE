@@ -11,6 +11,7 @@ export const SupplyChainProvider = ({ children }) => {
   const [salesOrders, setSalesOrders] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [warehouses, setWarehouses] = useState([]);
+  const [fleet, setFleet] = useState({ forklifts: 0, palletJacks: 0 });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -30,6 +31,7 @@ export const SupplyChainProvider = ({ children }) => {
         fetchSalesOrders(),
         fetchInventory(),
         fetchWarehouses(),
+        fetchFleet(),
       ]);
     } catch (err) {
       console.error("SCM Data Refresh Error:", err);
@@ -67,6 +69,11 @@ export const SupplyChainProvider = ({ children }) => {
   const fetchWarehouses = async () => {
     const res = await inventoryApi.getWarehouses();
     setWarehouses(res.data);
+  };
+
+  const fetchFleet = async () => {
+    const res = await scmApi.getFleet();
+    setFleet(res.data);
   };
 
   // --- ACTIONS ---
@@ -259,7 +266,7 @@ export const SupplyChainProvider = ({ children }) => {
     dest: "Standard Distribution", // Fixed for now or use meta
     method:
       s.carrier === "FedEx" ? "Air" : s.carrier === "Maersk" ? "Sea" : "Road",
-    eta: "TBD",
+    eta: s.estimated_arrival ? new Date(s.estimated_arrival).toLocaleDateString() : "TBD",
     status: s.status === "SHIPPED" ? "On Time" : "Processing",
   }));
 
@@ -281,7 +288,6 @@ export const SupplyChainProvider = ({ children }) => {
             : so.status,
   }));
 
-  const [fleet] = useState({ forklifts: 4, palletJacks: 12 });
   const [returns] = useState([]);
   const [forecasts] = useState([]);
   const [categoryTrends] = useState([]);
