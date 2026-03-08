@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import date, datetime
-from typing import List
+from typing import List, Optional
 
 
 class EmployeeCreate(BaseModel):
@@ -10,6 +10,32 @@ class EmployeeCreate(BaseModel):
     department: str
     department_id: int | None = None
     basic_salary: float
+    user_id: int | None = None
+
+
+class EmployeeUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+    department: Optional[str] = None
+    department_id: Optional[int] = None
+    basic_salary: Optional[float] = None
+    user_id: Optional[int] = None
+
+
+class EmployeeResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    role: Optional[str] = None
+    department: str
+    department_id: Optional[int] = None
+    basic_salary: float
+    user_id: Optional[int] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
 
 
 class DepartmentCreate(BaseModel):
@@ -34,6 +60,18 @@ class LeaveCreate(BaseModel):
     leave_type: str
     start_date: date
     end_date: date
+
+class LeaveResponse(BaseModel):
+    id: int
+    employee_id: int
+    leave_type: str
+    start_date: date
+    end_date: date
+    status: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 class PayrollResponse(BaseModel):
     id: int

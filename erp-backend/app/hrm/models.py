@@ -34,6 +34,7 @@ class Employee(Base):
     department = Column(String, nullable=False) # Legacy field, keeping for now
     department_id = Column(Integer, ForeignKey("hrm_departments.id"), nullable=True)
     basic_salary = Column(Numeric(12, 2), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
